@@ -1,0 +1,62 @@
+CREATE PROCEDURE createDriver(
+@Name varchar(80),
+@Status varchar(10),
+@Picture text,
+@Latitude varchar(30),
+@Longitude varchar(30)
+      BEGIN
+         INSERT INTO Position(Latitude, Longitude) VALUES(@Latitude, @Longitude);
+         INSERT INTO Driver(Name, Status, Picture, IDActualPosition) VALUES(@Name, @Status, @Picture, @@Identity);
+      END
+
+exec createDriver 
+    'Kenneth López',
+    'Free',
+    'https://s.aolcdn.com/dims-global/dims3/GLOB/legacy_thumbnail/640x400/quality/80/https://s.aolcdn.com/commerce/autodata/images/USC90ACC051A021001.jpg',
+    'latitude',
+    'longitude'
+
+CREATE PROCEDURE deleteDriver
+@ID int
+AS
+    BEGIN
+	 DECLARE @positionID AS int;
+	 SELECT @positionID = IDActualPosition FROM Driver WHERE IDDriver = @ID;
+         DELETE FROM Driver WHERE Driver.IDDriver = @positionID;
+         DELETE FROM Position WHERE Position.IDPosition = @positionID;
+      END
+
+exec deleteDriver 1
+
+
+CREATE PROCEDURE updateDriver(
+    @ID int,
+    @Name varchar(80),
+    @Status varchar(10),
+    @Picture text,
+    @Latitude varchar(30),
+    @Longitude varchar(30)
+)
+AS
+      BEGIN
+	DECLARE @positionID AS int;
+	SELECT @positionID = IDActualPosition FROM Driver WHERE IDDriver = @ID;
+         UPDATE [Position] SET          
+            Latitude = @Latitude,
+            Longitude = @Longitude    
+         WHERE IDPosition = @positionID;
+
+         UPDATE Driver SET 
+            Name = @Name,
+            Status = @Status,
+            Picture = @Picture
+         WHERE IDDriver = @ID;
+      END
+
+exec updateDriver 
+     1,
+     'Kenneth López',
+     'Free',
+     'https://s.aolcdn.com/commerce/autodata/images/USC70ACC051A021001.jpg',
+     'latitude',
+     'longitude'
